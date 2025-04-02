@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
-import './App.css';
+import { useState } from 'react';
 
 function App() {
-  const [items, setItems] = useState([]);
-
-  const countries = [
+  const data = [
     {
       name: "India",
       children: [
         {
           name: "Rajasthan",
-          children: [
-            { name: "Jaipur" },
-            { name: "Jodhpur" }
-          ],
+          children: [{ name: "Jaipur" }, { name: "Jodhpur" }],
         },
         {
           name: "MP",
@@ -45,33 +39,32 @@ function App() {
     },
     {
       name: "South Africa",
-      children: [
-        { name: "Cape Town" },
-        { name: "Durban" }
-      ],
+      children: [{ name: "Cape Town" }, { name: "Durban" }],
     },
   ];
+  const [expanded, setExpanded] = useState({});
 
-  useEffect(() => {
-    setItems(countries); 
-  }, []);
-
-  function depthFirstSearch(data) {
-    return data.map((item, index) => (
-      <li key={index}>
-        <input type="checkbox"  />{item.name}
-        {item.children && <ul>{depthFirstSearch(item.children)}</ul>} 
-      </li>
-    ));
-  }
-
-  return (
-    <div>
-      <ul>
-        {depthFirstSearch(items)} 
-      </ul>
-    </div>
+  const toggleExpand = (name) => {
+    setExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+                                                           
+  const renderList = (items) => (
+    <ul>
+      {items.map((item, index) => (
+        <li key={index}>
+          <input
+            type="checkbox"
+            onChange={() => toggleExpand(item.name)}
+            checked={expanded[item.name] || false}
+          />
+          {item.name}
+          {item.children && expanded[item.name] && renderList(item.children)}
+        </li>
+      ))}
+    </ul>
   );
+
+  return <div>{renderList(data)}</div>;
 }
 
 export default App;
